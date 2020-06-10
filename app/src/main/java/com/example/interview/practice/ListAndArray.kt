@@ -194,7 +194,7 @@ class ListAndArray {
 
     fun mergeKLists(lists: Array<ListNode?>): ListNode? {
         if (lists.isNullOrEmpty()) return null
-        val queue = PriorityQueue<ListNode>(object : Comparator<ListNode> {
+        val queue = PriorityQueue(object : Comparator<ListNode> {
             override fun compare(o1: ListNode, o2: ListNode): Int {
                 if (o1 == o2) return 0
                 return o1.`val`.compareTo(o2.`val`)
@@ -204,17 +204,17 @@ class ListAndArray {
             node?.let { queue.offer(it) }
         }
         var root: ListNode? = null
-        var head: ListNode? = null
+        var currentNode: ListNode? = null
         while (queue.isNotEmpty()) {
-            if (head == null) {
-                head = queue.poll()
-                root = head
+            if (currentNode == null) {
+                currentNode = queue.poll()
+                root = currentNode
             } else {
-                head.next = queue.poll()
-                head = head?.next
+                currentNode.next = queue.poll()
+                currentNode = currentNode.next
             }
 
-            head?.next?.let { queue.offer(it) }
+            currentNode?.next?.let { queue.offer(it) }
         }
         return root
     }
@@ -291,5 +291,77 @@ class ListAndArray {
             }
         }
         return count
+    }
+
+    //Kth smallest in a sorted grid
+    fun kthSmallest(matrix: Array<IntArray>, k: Int): Int {
+        val n = matrix.size
+        if (k >= n * n) return matrix[n - 1][n - 1]
+        val heap: PriorityQueue<Triple<Int, Int, Int>> =
+            PriorityQueue { t1, t2 -> t1.first.compareTo(t2.first) }
+        var steps = 0
+        for (i in 0 until min(k, n)) {
+            heap.offer(Triple(matrix[i][0], i, 0))
+        }
+
+        while (steps < k - 1) {
+            val (_, row, col) = heap.poll()
+            if (col < n - 1)
+                heap.offer(Triple(matrix[row][col + 1], row, col + 1))
+            steps++
+        }
+        return heap.poll().first
+    }
+
+    fun canPartitionKSubsets(nums: IntArray, k: Int): Boolean {
+        val sum = nums.sum()
+        if (sum % k > 0) return false
+        val target = sum / k
+        val sums = IntArray(k)
+
+        return canPartitionKSubsets(nums, 0, target, sums)
+    }
+
+    private fun canPartitionKSubsets(
+        nums: IntArray,
+        start: Int,
+        target: Int,
+        sums: IntArray
+    ): Boolean {
+        if (start == nums.size) return true
+        for (i in sums.indices) {
+            if (sums[i] + nums[start] <= target) {
+                sums[i] += nums[start]
+                if (canPartitionKSubsets(nums, start + 1, target, sums)) return true
+                sums[i] -= nums[start]
+            }
+        }
+        return false
+    }
+
+    fun combinationSum(candidates: IntArray, target: Int): List<List<Int>> {
+        val result = ArrayList<List<Int>>()
+        combinationSumHelper(candidates, 0, target, ArrayList(), result)
+        return result
+    }
+
+    private fun combinationSumHelper(
+        candidates: IntArray,
+        start: Int,
+        target: Int,
+        list: ArrayList<Int>,
+        result: ArrayList<List<Int>>
+    ) {
+        if (target == 0) {
+            result.add(ArrayList(list))
+            return
+        }
+        if (target < 0 || start == candidates.size) return
+
+        val num = candidates[start]
+        list.add(num)
+        combinationSumHelper(candidates, start, target - num, list, result)
+        list.remove(num)
+        combinationSumHelper(candidates, start + 1, target, list, result)
     }
 }

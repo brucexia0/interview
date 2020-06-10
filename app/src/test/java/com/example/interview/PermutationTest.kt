@@ -35,7 +35,22 @@ class PermutationTest {
     fun testWordBreak2() {
         val input1 = "Leetcode"
         val words1 = listOf("Leet", "code")
-        val res1 = listOf( "Leet code")
-        assertEquals(res1,underTest.wordBreak2(input1, words1))
+        val res1 = listOf("Leet code")
+        assertEquals(res1, underTest.wordBreak2(input1, words1))
+    }
+
+    @Test
+    fun testMaximumSwap() {
+        val n1 = 98368
+        val n2 = 1993
+        assertEquals(98863, underTest.maximumSwap(n1))
+        assertEquals(9913, underTest.maximumSwap(n2))
+    }
+
+    @Test
+    fun testPermute() {
+        val a1 = intArrayOf(1, 1, 3)
+        val result = underTest.permute(a1)
+        println(result)
     }
 }

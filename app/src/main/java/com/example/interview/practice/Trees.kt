@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import kotlin.collections.ArrayList
 import kotlin.math.max
 
-class TreeNode(val `val`: Int) {
+class TreeNode(var `val`: Int) {
     var left: TreeNode? = null
     var right: TreeNode? = null
 }
@@ -14,7 +14,7 @@ class Trees {
     fun rightSideView(root: TreeNode): List<Int> {
         val result = ArrayList<Int>()
         val queue = LinkedBlockingQueue<TreeNode>()
-        root?.let { queue.add(root) }
+        root.let { queue.add(root) }
 
         while (queue.isNotEmpty()) {
             var size = queue.size
@@ -125,7 +125,7 @@ class Trees {
         while (node != null || stack.isNotEmpty()) {
             while (node != null) {
                 stack.push(node)
-                node = node!!.left
+                node = node.left
             }
 
             node = stack.pop()
@@ -206,5 +206,77 @@ class Trees {
             lca = node
         }
         return Math.max(left, right)
+    }
+
+
+    fun widthOfBinaryTree(root: TreeNode?): Int {
+        root ?: return 0
+        val queue: Queue<Pair<TreeNode, Int>> = LinkedList()
+        queue.offer(root to 1)
+        var maxWidth = 0
+        var depth = 0
+        while (queue.isNotEmpty()) {
+            val size = queue.size
+            var firstPos = Int.MIN_VALUE
+            for (i in 0 until size) {
+                val (node, pos) = queue.poll()
+                if (i == 0) {
+                    firstPos = pos
+                }
+                if (i == size - 1) {
+                    maxWidth = max(maxWidth, pos - firstPos + 1)
+                }
+                node.left?.let { queue.offer(it to pos * 2) }
+                node.right?.let { queue.offer(it to pos * 2 + 1) }
+            }
+            depth++
+
+        }
+        return maxWidth
+    }
+
+    var maxLen = 0
+    fun longestConsecutive(root: TreeNode?): Int {
+
+        return maxLen
+    }
+
+    fun longestPath(root: TreeNode?): Pair<Int, Int> {
+        root ?: return 0 to 0
+        var decrease = 1
+        var increase = 1
+        root.left?.let {
+            val (inc, dec) = longestPath(root.left)
+            if (root.`val` == it.`val` + 1) {
+                increase += inc
+            } else if (root.`val` == it.`val` - 1) {
+                decrease += dec
+            }
+        }
+        root.right?.let {
+            val (inc, dec) = longestPath(root.right)
+            if (root.`val` == it.`val` + 1) {
+                increase = max(increase, inc + 1)
+            } else if (root.`val` == it.`val` - 1) {
+                decrease = max(dec, dec + 1)
+            }
+        }
+        maxLen = max(maxLen, increase + decrease - 1)
+        return increase to decrease
+    }
+
+    var maxSum = 0
+    fun maxPathSum(root: TreeNode?): Int {
+        maxGain(root)
+        return maxSum
+    }
+
+    private fun maxGain(root: TreeNode?): Int {
+        root ?: return 0
+        val leftGain = maxGain(root.left)
+        val rightGain = maxGain(root.right)
+        val sum = leftGain + rightGain + root.`val`
+        maxSum = max(maxSum, sum)
+        return max(leftGain, rightGain) + root.`val`
     }
 }

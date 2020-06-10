@@ -1,6 +1,5 @@
 package com.example.interview.practice
 
-import com.example.interview.swap
 import java.lang.Integer.max
 import java.util.*
 import kotlin.collections.ArrayList
@@ -34,6 +33,25 @@ class Permutation {
         for (j in i until (size + i) / 2) {
             nums.swap(j, size - 1 - j + i)
         }
+    }
+
+    fun maximumSwap(num: Int): Int {
+        val s = num.toString()
+        val dp = IntArray(s.length)//STore the index of  biggest number
+        dp[s.length - 1] = s.length - 1
+        for (i in s.length - 2 downTo 0) {
+            dp[i] = if (s[i] > s[dp[i + 1]]) i else dp[i + 1]
+        }
+        for (i in 0 until s.length - 1) {
+            if (dp[i] != i && s[i] != s[dp[i]]) {
+                val sb = StringBuilder(s)
+                val tmp = sb[i]
+                sb[i] = sb[dp[i]]
+                sb[dp[i]] = tmp
+                return Integer.parseInt(sb.toString())
+            }
+        }
+        return num
     }
 
     fun mergeIntervals(intervals: Array<IntArray>): Array<IntArray> {
@@ -81,7 +99,7 @@ class Permutation {
 
     fun wordBreak(s: String, wordDict: List<String>): Boolean {
         val wordSet: Set<String> = HashSet(wordDict)
-        val dp = Array<Boolean>(s.length) { false }
+        val dp = Array(s.length) { -1 }
         return wordBreak(s, 0, wordSet, dp)
     }
 
@@ -90,9 +108,10 @@ class Permutation {
         s: String,
         start: Int,
         wordSet: Set<String>,
-        dp: Array<Boolean>
+        dp: Array<Int>
     ): Boolean {
-        if (start == s.length || dp[start]) return true
+        if (start == s.length || dp[start] == 1) return true
+        if (dp[start] == 0) return false
         for (i in start until s.length) {
             if (wordSet.contains(s.substring(start, i + 1)) && wordBreak(
                     s,
@@ -101,10 +120,11 @@ class Permutation {
                     dp
                 )
             ) {
-                dp[start] = true
+                dp[start] = 1
                 return true
             }
         }
+        dp[start] = 0
         return false
     }
 
@@ -146,5 +166,31 @@ class Permutation {
         }
 
         return result
+    }
+
+    fun permute(nums: IntArray): List<List<Int>> {
+        val result = ArrayList<List<Int>>()
+        permuteHelper(nums, 0, result)
+        return result
+    }
+
+    fun permuteHelper(nums: IntArray, start: Int, result: ArrayList<List<Int>>) {
+        if (start >= nums.size - 1) {
+            result.add(nums.toList())
+            return
+        }
+        val set = HashSet<Int>()
+        for (i in start until nums.size) {
+            if (!set.add(nums[i])) continue
+            nums.swap(start, i)
+            permuteHelper(nums, start + 1, result)
+            nums.swap(start, i)
+        }
+    }
+
+    private fun IntArray.swap(i: Int, j: Int) {
+        val tmp = this[i]
+        this[i] = this[j]
+        this[j] = tmp
     }
 }

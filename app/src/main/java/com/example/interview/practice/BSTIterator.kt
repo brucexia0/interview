@@ -12,7 +12,7 @@ class BSTIterator(val root: TreeNode) {
     /** @return the next smallest number */
     fun next(): Int {
         val node = stack.pop()
-        if (node.right != null) pushLefts(node.right!!)
+        node.right?.let { pushLefts(it) }
         return node.`val`
     }
 

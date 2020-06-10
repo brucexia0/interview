@@ -5,7 +5,7 @@ class DoubledLinkedNode(val key: Int, val value: Int) {
     var next: DoubledLinkedNode? = null
 }
 
-class LURCache(private val capacity: Int) {
+class LRUCache(private val capacity: Int) {
     val map = HashMap<Int, DoubledLinkedNode>()
     var head: DoubledLinkedNode? = null
     var tail: DoubledLinkedNode? = null

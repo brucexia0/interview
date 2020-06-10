@@ -2,6 +2,7 @@ package com.example.interview.practice
 
 import java.lang.StringBuilder
 import java.util.*
+import kotlin.collections.ArrayList
 
 class BracketIssues {
     fun minRemoveToMakeValid(s: String): String {
@@ -93,4 +94,37 @@ class BracketIssues {
         return result.toString()
     }
 
+    fun addOperators(num: String, target: Int): List<String> {
+        val result = ArrayList<String>()
+        if (num.isEmpty()) return result
+        addOperatorHelper(num, 0, 0, target, result, "")
+        return result
+    }
+
+    fun addOperatorHelper(
+        s: String,
+        start: Int,
+        currentValue: Int,
+        target: Int,
+        list: ArrayList<String>,
+        currentStr: String
+    ) {
+        if (start == s.length) {
+            if (currentValue == target)
+                list += currentStr
+            return
+        }
+        if (s[start] == '0') return
+
+        for (i in start until s.length) {
+            val curr = Integer.parseInt(s.substring(start, i + 1))
+            if (start == 0) {
+                addOperatorHelper(s, i + 1, curr, target, list, "$curr")
+            }
+            addOperatorHelper(s, i + 1, currentValue + curr, target, list, "$currentStr+$curr")
+            addOperatorHelper(s, i + 1, currentValue - curr, target, list, "$currentStr-$curr")
+            addOperatorHelper(s, i + 1, currentValue * curr, target, list, "$currentStr*$curr")
+        }
+
+    }
 }

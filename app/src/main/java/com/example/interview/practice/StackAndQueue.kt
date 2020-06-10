@@ -3,6 +3,9 @@ package com.example.interview.practice
 import java.util.*
 
 class StackAndQueue {
+    // https://leetcode.com/problems/simplify-path/
+    // Input: "/a/./b/../../c/"
+    //Output: "/c"
     fun simplifyPath(path: String): String {
         val paths = path.split("/")
         val s = Stack<String>()
@@ -102,7 +105,11 @@ class StackAndQueue {
         var occupied: Int = 0
     }
 
+    // https://leetcode.com/problems/exclusive-time-of-functions/
     // login format taskId:[start|end]:time
+    // Solution: push all "start" log into stack
+    // for every end log, pop the stack top calculate duration and update occupied time of
+    // next stack top
     fun exclusiveTime(n: Int, logs: List<String>): IntArray {
         val START = "start"
         val stack = Stack<TaskStartData>()//Stack of task start log

@@ -1,6 +1,9 @@
 package com.example.interview.practice
 
 import java.lang.StringBuilder
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.max
 
 class Strings {
@@ -40,8 +43,8 @@ class Strings {
     }
 
     // Given a string, find the length of the longest substring T that contains at most k distinct characters.
-    // Solution: Sliding window + hashset.
-    fun lengthOfLongestSubstringKDistinct(s: String, k: Int): Int {
+    // Solution: Sliding window + HashMap.
+    fun lengthOfLongestSubstringKDistinctV1(s: String, k: Int): Int {
         if (s.isEmpty() || k == 0) return 0
         val map = HashMap<Char, Int>()
         var start = 0
@@ -66,6 +69,29 @@ class Strings {
         }
         return maxLength
     }
+
+    fun lengthOfLongestSubstringKDistinct(s: String, k: Int): Int {
+        if (s.isEmpty() || k == 0) return 0
+        val map = HashMap<Char, Int>()
+        var start = 0
+        var maxLength = 0
+        for (end in s.indices) {
+            val c = s[end]
+            map[c] = map.getOrDefault(c, 0) + 1
+            while (map.size > k) {
+                val head = s[start]
+                if (map[head] == 1) {
+                    map.remove(head)
+                } else {
+                    map[head] = map.getOrDefault(head, 0) - 1
+                }
+                start++
+            }
+            maxLength = max(maxLength, end - start + 1)
+        }
+        return maxLength
+    }
+
 
     fun reorganizeString(s: String): String {
         return rearrangeStringKDistance(s, 2)
@@ -106,5 +132,20 @@ class Strings {
             sb.append('a' + (c - diff + 26).toInt() % 26)
         }
         return sb.toString()
+    }
+
+    // https://leetcode.com/problems/longest-absolute-file-path/
+    fun lengthLongestPath(input: String): Int {
+        val stack = ArrayDeque<Int>()
+        stack.push(0)
+        var maxLength = 0
+        for (s in input.split("\n")) {
+            val level = s.lastIndexOf("\t") + 1
+            while (stack.size > level + 1) stack.pop()
+            val length = stack.peek() + s.length - level + 1
+            stack.push(length)
+            if (s.contains(".")) maxLength = max(maxLength, length - 1)
+        }
+        return maxLength
     }
 }

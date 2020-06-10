@@ -43,7 +43,7 @@ class Misc {
             for (i in word.indices) {
                 val newWord = word.substring(0, i) + "*" + word.substring(i + 1, size)
                 for (adjacent in allComDict.getOrDefault(newWord, ArrayList())) {
-                    if (adjacent.equals(endWord)) {
+                    if (adjacent == endWord) {
                         return level + 1
                     }
                     if (visited[adjacent] != true) {
@@ -91,7 +91,7 @@ class Misc {
     }
 
     fun multiplyString(num1: String, num2: String): String {
-        if(num1=="0" || num2=="0")return "0"
+        if (num1 == "0" || num2 == "0") return "0"
         val len1 = num1.length
         val len2 = num2.length
         val s = StringBuilder()
@@ -193,8 +193,8 @@ class Misc {
         return if (negatives == 1) -quotient else quotient
     }
 
-    val BILLION = Math.pow(10.0, 9.0)
-    val MILLION = Math.pow(10.0, 6.0)
+    val BILLION = Math.pow(10.0, 9.0).toInt()
+    val MILLION = Math.pow(10.0, 6.0).toInt()
     val THOUSAND = 1000
     val BILLION_STR = "Billion"
     val MILLION_STR = "Million"
@@ -216,7 +216,7 @@ class Misc {
         "Ten",
         "Twenty",
         "Thirty",
-        "Fourty",
+        "Forty",
         "Fifty",
         "Sixty",
         "Seventy",
@@ -232,12 +232,25 @@ class Misc {
         val hundreds = num % BILLION % MILLION % THOUSAND
         val result = StringBuilder()
         if (billions > 0) {
-
+            result.append(hundredsNum(billions)).append(" ").append(BILLION_STR)
         }
-        return ""
+        if (millions > 0) {
+            result.appendSpaceIfNotEmpty()
+            result.append(hundredsNum(millions)).append(" ").append(MILLION_STR)
+        }
+        if (thousands > 0) {
+            result.appendSpaceIfNotEmpty()
+            result.append(hundredsNum(thousands)).append(" ").append(THOUSAND_STR)
+        }
+        if (hundreds > 0) {
+            result.appendSpaceIfNotEmpty()
+            result.append(hundredsNum(hundreds))
+        }
+
+        return result.toString()
     }
 
-    fun hundredsNum(value: Int) {
+    fun hundredsNum(value: Int): String {
         val h = value / 100
         val tens = value % 100
         val sb = StringBuilder()
@@ -247,10 +260,17 @@ class Misc {
         if (tens > 19) {
             sb.appendSpaceIfNotEmpty()
             sb.append(TENS[tens / 10 - 1])
-        }
-        if (tens >= 10) {
+            val n = value % 10
+            if (n > 0) {
+                sb.appendSpaceIfNotEmpty()
+                sb.append(DIGITS[n-1])
+            }
+        } else if (tens > 10) {
             sb.appendSpaceIfNotEmpty()
-            sb.append(TEENS[tens - 10])
+            sb.append(TEENS[tens - 11])
+        } else if (tens == 10) {
+            sb.appendSpaceIfNotEmpty()
+            sb.append(TENS[0])
         } else {
             val n = value % 10
             if (n > 0) {
@@ -258,6 +278,7 @@ class Misc {
                 sb.append(DIGITS[n])
             }
         }
+        return sb.toString()
     }
 
     fun StringBuilder.appendSpace() = append(" ")

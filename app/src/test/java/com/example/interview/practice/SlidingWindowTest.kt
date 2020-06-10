@@ -25,4 +25,11 @@ class SlidingWindowTest {
         assertEquals("aab", underTest.minWindow(s2, t2))
         assertEquals("BANC", underTest.minWindow(s1, t1))
     }
+
+    @Test
+    fun testLongestOnes() {
+        val a1 = intArrayOf(1, 0, 0, 0, 1, 1, 0)
+        val k1 = 2
+        assertEquals(4, underTest.longestOnes(a1, k1))
+    }
 }

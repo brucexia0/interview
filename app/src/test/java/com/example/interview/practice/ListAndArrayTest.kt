@@ -46,4 +46,10 @@ class ListAndArrayTest {
         val n1 = 2
         assertEquals(8, underTest.leastInterval(a1, n1))
     }
+
+    @Test
+    fun testKthSmallest() {
+        val a = arrayOf(intArrayOf(1, 2), intArrayOf(1, 3))
+        assertEquals(2, underTest.kthSmallest(a, 3))
+    }
 }

@@ -80,4 +80,10 @@ class DPTest {
         map3.forEach { print(it) }
         println()
     }
+
+    @Test
+    fun testLongestArithmetic() {
+        val a1 = intArrayOf( 0, 94, 3, 0, 3)
+        assertEquals(2, underTest.longestArithSeqLength(a1))
+    }
 }

@@ -4,6 +4,7 @@ import kotlin.math.max
 
 class TrieNode {
     var children = HashMap<Char, TrieNode>()
+    var isWord: Boolean = false
 }
 
 class StringTrie {
@@ -19,11 +20,37 @@ class StringTrie {
                 currNode = newNode
             }
         }
+        currNode.isWord = true
+    }
+
+    fun find(s: String): Boolean {
+        if (s.isEmpty()) return true
+        return helper(s, root)
+    }
+
+    private fun helper(s: String, root: TrieNode): Boolean {
+        val c = s[0]
+        if (s.length == 1) return (c == '*' || (root.children.containsKey(c) && root.children[c]!!.isWord))
+
+        when (c) {
+            '*' -> {
+                for (node in root.children.values) {
+                    if (helper(s.substring(1, s.length), node)) return true
+                }
+                return false
+            }
+            else -> {
+                if (!root.children.containsKey(c)) return false
+                val node = root.children[c]!!
+                return helper(s.substring(1, s.length), node)
+            }
+        }
     }
 }
 
 class Trie {
-
+    // https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/
+    //Given a non-empty array of numbers, a0, a1, a2, … , an-1, where 0 ≤ ai < 231.
     fun findMaximumXOR(nums: IntArray): Int {
         // Compute length L of max number in a binary representation
         var maxNum = nums.max()!!
@@ -44,7 +71,8 @@ class Trie {
             var currXor = 0
             for (bit in num.toCharArray()) {
                 // insert new number in trie
-                val bitNode = node.children.getOrDefault(bit,
+                val bitNode = node.children.getOrDefault(
+                    bit,
                     TrieNode()
                 )
                 node.children[bit] = bitNode

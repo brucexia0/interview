@@ -1,14 +1,16 @@
 package com.example.interview.practice
 
-import android.util.Log
+import com.example.interview.STEPS
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 class DP {
     fun numDecodings(s: String): Int {
-        return numDecodings(s, 0, Array(s.length) { 0 });
+        return numDecodings(s, 0, Array(s.length) { 0 })
     }
 
     private val UPPER = 26
@@ -39,6 +41,8 @@ class DP {
         return dp[startIndex]
     }
 
+    //https://leetcode.com/problems/continuous-subarray-sum/
+    // Given a list of non-negative numbers and a target integer k, write a function to check if the array has a continuous subarray of size at least 2 that sums up to a multiple of k, that is, sums up to n*k where n is also an integer.
     fun checkSubarraySum(nums: IntArray, k: Int): Boolean {
         val size = nums.size
         val dp = Array(size) { ArrayList<Int>() }
@@ -85,6 +89,7 @@ class DP {
     }
 
     /**
+     * https://leetcode.com/problems/wildcard-matching/
      * Wildcard match using DP.
      */
     fun isMatch(s: String, p: String): Boolean {
@@ -225,13 +230,131 @@ class DP {
         for (i in 0 until cols) {
             for (j in 0 until rows) {
                 maxHeightAbove[i][j] =
-                    if (j == 0) heightMap[0][i] else max(maxHeightAbove[j-1][i], heightMap[j][i])
+                    if (j == 0) heightMap[0][i] else max(maxHeightAbove[j - 1][i], heightMap[j][i])
             }
-            for (j in rows-1 downTo 0) {
+            for (j in rows - 1 downTo 0) {
                 maxHeightBelow[i][j] =
-                    if (j == 0) heightMap[0][i] else max(maxHeightAbove[j-1][i], heightMap[j][i])
+                    if (j == 0) heightMap[0][i] else max(maxHeightAbove[j - 1][i], heightMap[j][i])
             }
         }
         return sum
+    }
+
+    val MOD = 1000000007
+    fun numWays(steps: Int, arrLen: Int): Int {
+        var dp = intArrayOf(1)
+        for (i in 1..steps) {
+            val next = IntArray(Math.min(i + 1, arrLen))
+            for (j in next.indices) {
+                val x = if (j >= 1) dp[j - 1] else 0
+                val y = if (j < dp.size) dp[j] else 0
+                val z = if (j < dp.size - 1) dp[j + 1] else 0
+                next[j] = ((x + y) % MOD + z) % MOD
+            }
+            dp = next
+        }
+        return dp[0]
+    }
+
+    //[0,94,3,0,3]
+    fun longestArithSeqLength(A: IntArray): Int {
+        if (A.size < 3) return A.size
+        val dp = Array<HashMap<Int, Int>>(A.size) { HashMap() }//HashMa of Diff -> Length
+        var maxLength = 0
+        for (i in 0 until A.size - 1) {
+            for (j in i + 1 until A.size) {
+                val diff = A[j] - A[i]
+                dp[j][diff] = dp[i].getOrDefault(diff, 1) + 1
+                if (dp[j][diff]!! > maxLength) maxLength = dp[j][diff]!!
+            }
+        }
+        return maxLength
+    }
+
+    fun longestIncreasingPath(matrix: Array<IntArray>): Int {
+        val dp = Array(matrix.size) { IntArray(matrix[0].size) }
+        var max = 0
+        for (i in matrix.indices) {
+            for (j in matrix[0].indices) {
+                max = max(max, longestIncreasingPathDfs(matrix, 0, 0, dp))
+            }
+        }
+
+        return max
+    }
+
+    fun longestIncreasingPathDfs(
+        matrix: Array<IntArray>,
+        row: Int,
+        col: Int,
+        dp: Array<IntArray>
+    ): Int {
+        var max = 0
+        if (dp[row][col] > 0) return dp[row][col]
+        for ((x, y) in STEPS) {
+            val nRow = x + row
+            val nCol = y + col
+            if (nRow in matrix.indices && nCol in matrix[0].indices && matrix[nRow][nCol] > matrix[row][col]) {
+                dp[row][col] = 1 + longestIncreasingPathDfs(matrix, nRow, nCol, dp)
+            }
+        }
+        return dp[row][col]
+    }
+
+    // min number of squares that sum to n
+    fun numSquares(n: Int): Int {
+        return numSquaresHelper(n, HashMap())
+    }
+
+    private fun numSquaresHelper(n: Int, dp: HashMap<Int, Int>): Int {
+        val root = sqrt(n.toDouble()).toInt()
+        if (n % root == 0) {
+            dp[n] == 1
+            return 1
+        }
+        if (dp.containsKey(n)) return dp[n]!!
+        for (i in 1..root) {
+            dp[n] = min(dp.getOrDefault(n, 0), numSquaresHelper(n - i * i, dp) + 1)
+        }
+        return dp[n]!!
+    }
+
+    fun minimumTotal(triangle: List<List<Int>>): Int {
+        if (triangle.isEmpty()) return 0
+        val dp = IntArray(triangle.size)
+        dp[0] = triangle[0][0]
+        for (i in 1 until triangle.size) {
+            val row = triangle[i]
+            for (j in row.size - 1 downTo 0) {
+                val num = row[j]
+                if (j == 0) dp[j] += num
+                else if (j == row.size - 1) dp[j] = dp[j - 1] + num
+                else
+                    dp[j] = min(dp[j], dp[j - 1]) + num
+            }
+            println("row $i dp ${dp.contentToString()}")
+        }
+        return dp.min()!!
+    }
+
+    // https://leetcode.com/problems/coin-change/submissions/
+    fun coinChange(coins: IntArray, amount: Int): Int {
+        if (amount == 0) return 0
+        if (coins.isEmpty()) return -1
+        val count = coinChangeHelper(coins, amount, HashMap())
+        return if (count == Int.MAX_VALUE) -1 else count
+    }
+
+    fun coinChangeHelper(coins: IntArray, target: Int, dp: HashMap<Int, Int>): Int {
+        var minCount = Int.MAX_VALUE
+        if (dp.getOrDefault(target,0) > 0) return dp[target]!!
+        for (coin in coins) {
+            if (target == coin) return 1
+            if (coin > target) continue
+            minCount = min(minCount, coinChangeHelper(coins, target - coin, dp))
+        }
+        if (minCount == Int.MAX_VALUE) return Int.MAX_VALUE
+        dp[target] = 1 + minCount
+        return dp[target]!!
     }
 }
