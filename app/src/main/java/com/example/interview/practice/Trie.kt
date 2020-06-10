@@ -1,5 +1,6 @@
 package com.example.interview.practice
 
+import com.example.interview.STEPS
 import kotlin.math.max
 
 class TrieNode {
@@ -95,7 +96,7 @@ class Trie {
     }
 
     fun findWords(board: Array<CharArray>, words: Array<String>): List<String> {
-        val result = ArrayList<String>()
+        val result = HashSet<String>()
         //construct trie
         val trie = StringTrie()
         for (word in words) {
@@ -103,8 +104,38 @@ class Trie {
         }
         //Backtrack traverse the grid
         for (i in board.indices) {
-
+            for (j in board[0].indices) {
+                findWords(board, ArrayList(), i to j, trie.root, result)
+            }
         }
-        return result
+        return result.toList()
+    }
+
+    private fun findWords(
+        board: Array<CharArray>,
+        path: ArrayList<Pair<Int, Int>>,
+        point: Pair<Int, Int>,
+        node: TrieNode,
+        result: HashSet<String>
+    ) {
+        val (cX, cY) = point
+        if (!node.children.containsKey(board[cX][cY])) {
+            return
+        }
+        path.add(point)
+        val currNode = node.children[board[cX][cY]]!!
+        if (currNode.isWord) {
+            val word = path.map { (x, y) -> board[x][y] }.joinToString("")
+            result.add(word)
+        } else {
+            for ((x, y) in STEPS) {
+                val nextX = cX + x
+                val nextY = cY + y
+                if (nextX in board.indices && nextY in board[0].indices && !path.contains(nextX to nextY)) {
+                    findWords(board, path, nextX to nextY, currNode, result)
+                }
+            }
+        }
+        path.removeAt(path.size - 1)
     }
 }
